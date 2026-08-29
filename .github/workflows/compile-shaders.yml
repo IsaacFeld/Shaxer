@@ -8,7 +8,7 @@ on:
 
 jobs:
   compile:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repository
@@ -19,26 +19,17 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Install Wine (for MGFXC)
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update
-          sudo apt-get install -y wine wine32 wine64
-
       - name: Install MGFXC Tool
         run: dotnet tool install -g dotnet-mgfxc --version 3.8.1.303
 
       - name: Compile HLSL Shaders
+        shell: pwsh
         run: |
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          # Compiles all .fx files in Content/ to .mgfx targeting OpenGL
-          for file in Content/*.fx; do
-            if [ -f "$file" ]; then
-              filename=$(basename "$file" .fx)
-              echo "Compiling $file -> Content/${filename}.mgfx"
-              mgfxc "$file" "Content/${filename}.mgfx" /profile:OpenGL
-            fi
-          done
+          Get-ChildItem -Path Content/*.fx | ForEach-Object {
+            $output = "Content/" + $_.BaseName + ".mgfx"
+            Write-Host "Compiling $($_.FullName) -> $output"
+            mgfxc $_.FullName $output /profile:OpenGL
+          }
 
       - name: Commit and Push Compiled .mgfx Binaries
         uses: stefanzweifel/git-auto-commit-action@v5

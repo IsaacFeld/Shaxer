@@ -25,7 +25,7 @@ public class Game1 : Game
     private List<(VertexBuffer Vertices, IndexBuffer Indices, int TriangleCount)> _meshes = new();
     private Camera _camera;
     private BasicEffect _effect;
-    private Effect _toonEffect;
+    private Effect _toonEffect; // Custom Shader
     
 
 

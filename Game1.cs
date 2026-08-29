@@ -25,6 +25,7 @@ public class Game1 : Game
     private List<(VertexBuffer Vertices, IndexBuffer Indices, int TriangleCount)> _meshes = new();
     private Camera _camera;
     private BasicEffect _effect;
+    private Effect _toonEffect;
     
 
 
@@ -60,6 +61,21 @@ public class Game1 : Game
 
     protected override void LoadContent()
     {
+        string shaderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content", "ToonShader.mgfx");
+    
+        if (!File.Exists(shaderPath))
+        {
+            throw new FileNotFoundException($"Compiled shader not found at '{shaderPath}'. Push ToonShader.fx to GitHub to auto-generate it!");
+        }
+
+        byte[] shaderBytes = File.ReadAllBytes(shaderPath);
+        _toonEffect = new Effect(GraphicsDevice, shaderBytes);
+
+        // Configure uniform parameters
+        _toonEffect.Parameters["LightDirection"]?.SetValue(Vector3.Normalize(new Vector3(-1f, -1.5f, -1f)));
+        _toonEffect.Parameters["LightColor"]?.SetValue(new Vector3(1.0f, 0.95f, 0.85f));
+        _toonEffect.Parameters["AmbientColor"]?.SetValue(new Vector3(0.25f, 0.25f, 0.35f));
+        _toonEffect.Parameters["BandCount"]?.SetValue(3.0f);
         // Load GLTF directly via pure C#
         string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content", "pixel_scene.glb");
         var modelRoot = ModelRoot.Load(fullPath);

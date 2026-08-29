@@ -13,9 +13,9 @@ cbuffer Parameters : register(b0)
     matrix WorldViewProjection;
     matrix World;
 
-    float4 LightDirection; // Use float4 instead of float3 (xyz = direction, w = unused)
-    float4 LightColor;     // Use float4 instead of float3 (rgb = color, a = unused)
-    float4 AmbientColor;   // Use float4 instead of float3 (rgb = color, a = unused)
+    float4 LightDirection; // xyz = direction, w = unused
+    float4 LightColor;     // rgb = color, a = unused
+    float4 AmbientColor;   // rgb = color, a = unused
     float4 ShaderParams;   // x = BandCount, y,z,w = unused padding
 };
 
@@ -36,8 +36,13 @@ struct VertexShaderOutput
 VertexShaderOutput MainVS(in VertexShaderInput input)
 {
     VertexShaderOutput output;
+    
+    // Transform vertex position to clip space
     output.Position = mul(input.Position, WorldViewProjection);
-    output.Normal = mul(float4(input.Normal, 0.0), World).xyz;
+    
+    // Transform normal vector to world space using the 3x3 rotation matrix
+    output.Normal = mul(input.Normal, (float3x3)World);
+    
     output.Color = input.Color;
     return output;
 }
@@ -47,9 +52,10 @@ float4 MainPS(VertexShaderOutput input) : COLOR0
     float3 N = normalize(input.Normal);
     float3 L = normalize(-LightDirection.xyz);
 
+    // Standard Lambertian diffuse lighting
     float NdotL = max(0.0, dot(N, L));
 
-    // ShaderParams.x stores BandCount
+    // Quantize continuous lighting into discrete steps
     float bandCount = max(1.0, ShaderParams.x);
     float quantizedNdotL = floor(NdotL * bandCount) / bandCount;
 

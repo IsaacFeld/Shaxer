@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Shaxer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a40286eb9c1a19db28ad84f978d5897ce36b21b4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+09e617ce87b5f95b66138acabe4e8caf1dd4f092")]
 [assembly: System.Reflection.AssemblyProductAttribute("Shaxer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Shaxer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

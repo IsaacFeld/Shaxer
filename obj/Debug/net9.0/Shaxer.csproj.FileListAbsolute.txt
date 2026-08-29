@@ -1,5 +1,7 @@
+/Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/bin/Debug/net9.0/Content/ToonShader.mgfx
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/bin/Debug/net9.0/Shaxer
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/bin/Debug/net9.0/Content/pixel_scene.glb
+/Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/bin/Debug/net9.0/Content/pixel_scene_fbx.fbx
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/bin/Debug/net9.0/Shaxer.deps.json
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/bin/Debug/net9.0/Shaxer.runtimeconfig.json
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/bin/Debug/net9.0/Shaxer.dll
@@ -32,12 +34,10 @@
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/Shaxer.AssemblyInfoInputs.cache
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/Shaxer.AssemblyInfo.cs
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/Shaxer.csproj.CoreCompileInputs.cache
+/Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/Shaxer.sourcelink.json
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/Shaxer.csproj.Up2Date
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/Shaxer.dll
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/refint/Shaxer.dll
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/Shaxer.pdb
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/Shaxer.genruntimeconfig.cache
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/ref/Shaxer.dll
-/Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/bin/Debug/net9.0/Content/pixel_scene_fbx.fbx
-/Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/Shaxer.sourcelink.json
-/Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/bin/Debug/net9.0/Content/ToonShader.mgfx

@@ -185,47 +185,60 @@ public class Game1 : Game
     }
 
     protected override void Draw(GameTime gameTime)
-    {
-        GraphicsDevice.SetRenderTarget(_pixelRenderTarget);
-        GraphicsDevice.Clear(Color.CornflowerBlue);
-        
-        GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-        GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-        
-        // 1. Calculate World-View-Projection Matrix
-        Matrix world = Matrix.Identity;
-        Matrix view = _camera.ViewMatrix;
-        Matrix projection = _camera.ProjectionMatrix;
-        Matrix worldViewProjection = world * view * projection;
-
-        // 2. Set Shader Uniforms
-        _toonEffect.Parameters["World"]?.SetValue(world);
-        _toonEffect.Parameters["WorldViewProjection"]?.SetValue(worldViewProjection);
+{
+    GraphicsDevice.SetRenderTarget(_pixelRenderTarget);
+    GraphicsDevice.Clear(Color.CornflowerBlue);
     
-        // Light & Band Parameters (can be updated dynamically if your light moves)
-        _toonEffect.Parameters["LightDirection"]?.SetValue(Vector3.Normalize(new Vector3(-1f, -1.5f, -1f)));
-        _toonEffect.Parameters["LightColor"]?.SetValue(new Vector3(1.0f, 0.95f, 0.85f));
-        _toonEffect.Parameters["AmbientColor"]?.SetValue(new Vector3(0.25f, 0.25f, 0.35f));
-        _toonEffect.Parameters["BandCount"]?.SetValue(3.0f);
+    GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+    GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+    
+    // 1. Calculate World-View-Projection Matrix
+    Matrix world = Matrix.Identity; // Vertices pre-transformed in LoadContent
+    Matrix view = _camera.ViewMatrix;
+    Matrix projection = _camera.ProjectionMatrix;
+    Matrix worldViewProjection = world * view * projection;
 
-        foreach (var pass in _toonEffect.CurrentTechnique.Passes)
+    // 2. Set Padded Shader Uniforms (MUST use Vector4 to match 16-byte alignment)
+    _toonEffect.Parameters["World"]?.SetValue(world);
+    _toonEffect.Parameters["WorldViewProjection"]?.SetValue(worldViewProjection);
+
+    Vector3 lightDir = Vector3.Normalize(new Vector3(-1f, -1.5f, -1f));
+    _toonEffect.Parameters["LightDirection"]?.SetValue(new Vector4(lightDir, 0f));
+
+    Vector3 lightCol = new Vector3(1.0f, 0.95f, 0.85f);
+    _toonEffect.Parameters["LightColor"]?.SetValue(new Vector4(lightCol, 1f));
+
+    Vector3 ambientCol = new Vector3(0.25f, 0.25f, 0.35f);
+    _toonEffect.Parameters["AmbientColor"]?.SetValue(new Vector4(ambientCol, 1f));
+
+    // ShaderParams.x stores BandCount (3.0f = 3 distinct color bands)
+    _toonEffect.Parameters["ShaderParams"]?.SetValue(new Vector4(3.0f, 0f, 0f, 0f));
+
+    // 3. Render Geometry
+    foreach (var pass in _toonEffect.CurrentTechnique.Passes)
+    {
+        pass.Apply();
+        foreach (var mesh in _meshes)
         {
-            pass.Apply();
-            foreach (var mesh in _meshes)
-            {
-                GraphicsDevice.SetVertexBuffer(mesh.Vertices);
-                GraphicsDevice.Indices = mesh.Indices;
-                GraphicsDevice.DrawIndexedPrimitives(Microsoft.Xna.Framework.Graphics.PrimitiveType.TriangleList, 0, 0, mesh.TriangleCount);
-            }
+            GraphicsDevice.SetVertexBuffer(mesh.Vertices);
+            GraphicsDevice.Indices = mesh.Indices;
+            GraphicsDevice.DrawIndexedPrimitives(
+                Microsoft.Xna.Framework.Graphics.PrimitiveType.TriangleList, 
+                0, 
+                0, 
+                mesh.TriangleCount
+            );
         }
-
-        GraphicsDevice.SetRenderTarget(null);
-        GraphicsDevice.Clear(Color.Black);
-        
-        _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
-        _spriteBatch.Draw(_pixelRenderTarget, GraphicsDevice.Viewport.Bounds, Color.White);
-        _spriteBatch.End();
-        
-        base.Draw(gameTime);
     }
+
+    // 4. Upscale Pixel Canvas to Screen
+    GraphicsDevice.SetRenderTarget(null);
+    GraphicsDevice.Clear(Color.Black);
+    
+    _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointClamp, null, null);
+    _spriteBatch.Draw(_pixelRenderTarget, GraphicsDevice.Viewport.Bounds, Color.White);
+    _spriteBatch.End();
+    
+    base.Draw(gameTime);
+}
 }

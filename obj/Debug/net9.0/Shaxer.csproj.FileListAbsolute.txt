@@ -39,3 +39,5 @@
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/Shaxer.genruntimeconfig.cache
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/ref/Shaxer.dll
 /Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/bin/Debug/net9.0/Content/pixel_scene_fbx.fbx
+/Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/obj/Debug/net9.0/Shaxer.sourcelink.json
+/Users/isaacfldmn/Desktop/Coding/Personal - Coding/Shaxer/bin/Debug/net9.0/Content/ToonShader.mgfx

@@ -48,21 +48,22 @@ public class Game1 : Game
         
         float internalAspectRatio = (float) RenderWidth / RenderHeight;
         _camera = new Camera(new Vector3(0, 10, 20), internalAspectRatio);
-        
+        /*
         _effect = new BasicEffect(GraphicsDevice) { VertexColorEnabled = true, LightingEnabled = true, PreferPerPixelLighting = false };
         _effect.DirectionalLight0.Enabled = true;
         _effect.DirectionalLight0.Direction = Vector3.Normalize(new Vector3(-1f, -1.5f, -1f));
         _effect.DirectionalLight0.DiffuseColor = new Vector3(0.9f, 0.85f, 0.8f);
 
         _effect.AmbientLightColor = new Vector3(0.25f, 0.25f, 0.35f);
-        
+        */
         base.Initialize();
     }
 
     protected override void LoadContent()
     {
+        
         string shaderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content", "ToonShader.mgfx");
-    
+        
         if (!File.Exists(shaderPath))
         {
             throw new FileNotFoundException($"Compiled shader not found at '{shaderPath}'. Push ToonShader.fx to GitHub to auto-generate it!");
@@ -70,13 +71,21 @@ public class Game1 : Game
 
         byte[] shaderBytes = File.ReadAllBytes(shaderPath);
         _toonEffect = new Effect(GraphicsDevice, shaderBytes);
+        
+        // Set padded vector parameters (passing Vector4 ensures exact 16-byte buffer copies)
+        Vector3 lightDir = Vector3.Normalize(new Vector3(-1f, -1.5f, -1f));
+        _toonEffect.Parameters["LightDirection"]?.SetValue(new Vector4(lightDir, 0f));
 
-        // Configure uniform parameters
-        _toonEffect.Parameters["LightDirection"]?.SetValue(Vector3.Normalize(new Vector3(-1f, -1.5f, -1f)));
-        _toonEffect.Parameters["LightColor"]?.SetValue(new Vector3(1.0f, 0.95f, 0.85f));
-        _toonEffect.Parameters["AmbientColor"]?.SetValue(new Vector3(0.25f, 0.25f, 0.35f));
-        _toonEffect.Parameters["BandCount"]?.SetValue(3.0f);
+        Vector3 lightCol = new Vector3(1.0f, 0.95f, 0.85f);
+        _toonEffect.Parameters["LightColor"]?.SetValue(new Vector4(lightCol, 1f));
+
+        Vector3 ambientCol = new Vector3(0.25f, 0.25f, 0.35f);
+        _toonEffect.Parameters["AmbientColor"]?.SetValue(new Vector4(ambientCol, 1f));
+
+        // ShaderParams: x = BandCount (3.0f)
+        _toonEffect.Parameters["ShaderParams"]?.SetValue(new Vector4(3.0f, 0f, 0f, 0f));
         // Load GLTF directly via pure C#
+        
         string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content", "pixel_scene.glb");
         var modelRoot = ModelRoot.Load(fullPath);
 
@@ -183,11 +192,23 @@ public class Game1 : Game
         GraphicsDevice.DepthStencilState = DepthStencilState.Default;
         GraphicsDevice.RasterizerState = RasterizerState.CullNone;
         
-        _effect.View = _camera.ViewMatrix;
-        _effect.Projection = _camera.ProjectionMatrix;
-        _effect.World = Matrix.Identity;
+        // 1. Calculate World-View-Projection Matrix
+        Matrix world = Matrix.Identity;
+        Matrix view = _camera.ViewMatrix;
+        Matrix projection = _camera.ProjectionMatrix;
+        Matrix worldViewProjection = world * view * projection;
 
-        foreach (var pass in _effect.CurrentTechnique.Passes)
+        // 2. Set Shader Uniforms
+        _toonEffect.Parameters["World"]?.SetValue(world);
+        _toonEffect.Parameters["WorldViewProjection"]?.SetValue(worldViewProjection);
+    
+        // Light & Band Parameters (can be updated dynamically if your light moves)
+        _toonEffect.Parameters["LightDirection"]?.SetValue(Vector3.Normalize(new Vector3(-1f, -1.5f, -1f)));
+        _toonEffect.Parameters["LightColor"]?.SetValue(new Vector3(1.0f, 0.95f, 0.85f));
+        _toonEffect.Parameters["AmbientColor"]?.SetValue(new Vector3(0.25f, 0.25f, 0.35f));
+        _toonEffect.Parameters["BandCount"]?.SetValue(3.0f);
+
+        foreach (var pass in _toonEffect.CurrentTechnique.Passes)
         {
             pass.Apply();
             foreach (var mesh in _meshes)

@@ -1,0 +1,47 @@
+name: Compile MonoGame Shaders
+
+on:
+  push:
+    paths:
+      - 'Content/**/*.fx'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install Wine (for MGFXC)
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y wine wine32 wine64
+
+      - name: Install MGFXC Tool
+        run: dotnet tool install -g dotnet-mgfxc --version 3.8.1.303
+
+      - name: Compile HLSL Shaders
+        run: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          # Compiles all .fx files in Content/ to .mgfx targeting OpenGL
+          for file in Content/*.fx; do
+            if [ -f "$file" ]; then
+              filename=$(basename "$file" .fx)
+              echo "Compiling $file -> Content/${filename}.mgfx"
+              mgfxc "$file" "Content/${filename}.mgfx" /profile:OpenGL
+            fi
+          done
+
+      - name: Commit and Push Compiled .mgfx Binaries
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-compile HLSL shaders to .mgfx [skip ci]"
+          file_pattern: 'Content/*.mgfx'

@@ -196,26 +196,15 @@ public class Game1 : Game
         Matrix projection = _camera.ProjectionMatrix;
         Matrix worldViewProjection = world * view * projection;
 
-
-        IEnumerator<EffectParameter> enumerator = _toonEffect.Parameters.GetEnumerator();
-        while (enumerator.MoveNext())
-        {
-            Console.Out.WriteLine(enumerator.Current.Name);
-        }
-        // Set matrices
+        // Direct uniform assignment
         _toonEffect.Parameters["World"]?.SetValue(world);
         _toonEffect.Parameters["WorldViewProjection"]?.SetValue(worldViewProjection);
 
-        // Set padded 16-byte vectors
         Vector3 lightDir = Vector3.Normalize(new Vector3(-1f, -1.5f, -1f));
         _toonEffect.Parameters["LightDirection"]?.SetValue(new Vector4(lightDir, 0f));
 
-        Vector3 lightCol = new Vector3(1.0f, 0.95f, 0.85f);
-        _toonEffect.Parameters["LightColor"]?.SetValue(new Vector4(lightCol, 1f));
-
-        Vector3 ambientCol = new Vector3(0.25f, 0.25f, 0.35f);
-        _toonEffect.Parameters["AmbientColor"]?.SetValue(new Vector4(ambientCol, 1f));
-
+        _toonEffect.Parameters["LightColor"]?.SetValue(new Vector4(1.0f, 0.95f, 0.85f, 1f));
+        _toonEffect.Parameters["AmbientColor"]?.SetValue(new Vector4(0.25f, 0.25f, 0.35f, 1f));
         _toonEffect.Parameters["ShaderParams"]?.SetValue(new Vector4(3.0f, 0f, 0f, 0f));
 
         foreach (var pass in _toonEffect.CurrentTechnique.Passes)
@@ -234,7 +223,7 @@ public class Game1 : Game
             }
         }
 
-        // Canvas upscale
+        // Upscale render target to screen
         GraphicsDevice.SetRenderTarget(null);
         GraphicsDevice.Clear(Color.Black);
     

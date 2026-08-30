@@ -1,21 +1,19 @@
 #if OPENGL
     #define SV_POSITION POSITION
-    #define VS_SHADERMODEL vs_4_0
-    #define PS_SHADERMODEL ps_4_0
+    #define VS_SHADERMODEL vs_3_0
+    #define PS_SHADERMODEL ps_3_0
 #else
     #define VS_SHADERMODEL vs_4_0_level_9_1
     #define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
-cbuffer Parameters : register(b0)
-{
-    float4x4 WorldViewProjection;
-    float4x4 World;
-    float4 LightDirection;
-    float4 LightColor;
-    float4 AmbientColor;
-    float4 ShaderParams;
-};
+// Standalone global uniforms (compat with MojoShader SM 3.0)
+float4x4 WorldViewProjection;
+float4x4 World;
+float4 LightDirection;
+float4 LightColor;
+float4 AmbientColor;
+float4 ShaderParams;
 
 struct VertexShaderInput
 {
@@ -35,11 +33,13 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 {
     VertexShaderOutput output;
     
-    // Explicit matrix multiplication
+    // Transform position to clip space
     output.Position = mul(input.Position, WorldViewProjection);
-    output.Normal = mul(input.Normal, (float3x3)World);
-    output.Color = input.Color;
     
+    // Transform normal to world space using 3x3 rotation
+    output.Normal = mul(input.Normal, (float3x3)World);
+    
+    output.Color = input.Color;
     return output;
 }
 
@@ -50,7 +50,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR0
 
     float NdotL = max(0.0, dot(N, L));
 
-    // Quantize light intensity
+    // Quantize light intensity into discrete color bands
     float bandCount = max(1.0, ShaderParams.x);
     float quantizedNdotL = floor(NdotL * bandCount) / bandCount;
 

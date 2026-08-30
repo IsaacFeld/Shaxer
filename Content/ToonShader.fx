@@ -1,19 +1,21 @@
 #if OPENGL
     #define SV_POSITION POSITION
-    #define VS_SHADERMODEL vs_3_0
-    #define PS_SHADERMODEL ps_3_0
+    #define VS_SHADERMODEL vs_4_0
+    #define PS_SHADERMODEL ps_4_0
 #else
     #define VS_SHADERMODEL vs_4_0_level_9_1
     #define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
-// Standalone uniform declarations match SM3 register offsets cleanly
-float4x4 WorldViewProjection;
-float4x4 World;
-float4 LightDirection;
-float4 LightColor;
-float4 AmbientColor;
-float4 ShaderParams;
+cbuffer Parameters : register(b0)
+{
+    float4x4 WorldViewProjection;
+    float4x4 World;
+    float4 LightDirection;
+    float4 LightColor;
+    float4 AmbientColor;
+    float4 ShaderParams;
+};
 
 struct VertexShaderInput
 {

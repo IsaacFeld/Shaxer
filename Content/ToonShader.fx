@@ -7,8 +7,7 @@
     #define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
-float4x4 WorldViewProjection;
-float4x4 World;
+float4x4 ViewProjection;
 float4 LightDirection;
 float4 LightColor;
 float4 AmbientColor;
@@ -32,11 +31,12 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 {
     VertexShaderOutput output;
     
-    output.Position = mul(input.Position, WorldViewProjection);
+    // input.Position is already in World Space from C# LoadContent
+    output.Position = mul(input.Position, ViewProjection);
     
-    // Using a float4 prevents MojoShader from shrinking the matrix size,
-    // which stops the C# Buffer.BlockCopy crash. The 0.0 ignores translation.
-    output.Normal = mul(float4(input.Normal, 0.0), World).xyz;
+    // input.Normal is already in World Space from C# LoadContent! 
+    // No matrix multiplication needed, bypassing the MojoShader optimization crash entirely.
+    output.Normal = input.Normal;
     
     output.Color = input.Color;
     return output;

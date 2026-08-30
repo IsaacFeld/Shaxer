@@ -191,14 +191,11 @@ public class Game1 : Game
         GraphicsDevice.DepthStencilState = DepthStencilState.Default;
         GraphicsDevice.RasterizerState = RasterizerState.CullNone;
     
-        Matrix world = Matrix.Identity;
-        Matrix view = _camera.ViewMatrix;
-        Matrix projection = _camera.ProjectionMatrix;
-        Matrix worldViewProjection = world * view * projection;
+        // Calculate ViewProjection (Vertices are already in World space)
+        Matrix viewProj = _camera.ViewMatrix * _camera.ProjectionMatrix;
 
-        // Direct uniform assignment
-        _toonEffect.Parameters["World"]?.SetValue(world);
-        _toonEffect.Parameters["WorldViewProjection"]?.SetValue(worldViewProjection);
+        // Set updated parameters
+        _toonEffect.Parameters["ViewProjection"]?.SetValue(viewProj);
 
         Vector3 lightDir = Vector3.Normalize(new Vector3(-1f, -1.5f, -1f));
         _toonEffect.Parameters["LightDirection"]?.SetValue(new Vector4(lightDir, 0f));
@@ -223,7 +220,6 @@ public class Game1 : Game
             }
         }
 
-        // Upscale render target to screen
         GraphicsDevice.SetRenderTarget(null);
         GraphicsDevice.Clear(Color.Black);
     

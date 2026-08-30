@@ -7,7 +7,6 @@
     #define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
-// Standalone global uniforms (compat with MojoShader SM 3.0)
 float4x4 WorldViewProjection;
 float4x4 World;
 float4 LightDirection;
@@ -33,11 +32,11 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 {
     VertexShaderOutput output;
     
-    // Transform position to clip space
     output.Position = mul(input.Position, WorldViewProjection);
     
-    // Transform normal to world space using 3x3 rotation
-    output.Normal = mul(input.Normal, (float3x3)World);
+    // Using a float4 prevents MojoShader from shrinking the matrix size,
+    // which stops the C# Buffer.BlockCopy crash. The 0.0 ignores translation.
+    output.Normal = mul(float4(input.Normal, 0.0), World).xyz;
     
     output.Color = input.Color;
     return output;
@@ -50,7 +49,6 @@ float4 MainPS(VertexShaderOutput input) : COLOR0
 
     float NdotL = max(0.0, dot(N, L));
 
-    // Quantize light intensity into discrete color bands
     float bandCount = max(1.0, ShaderParams.x);
     float quantizedNdotL = floor(NdotL * bandCount) / bandCount;
 

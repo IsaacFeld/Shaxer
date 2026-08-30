@@ -72,18 +72,17 @@ public class Game1 : Game
         byte[] shaderBytes = File.ReadAllBytes(shaderPath);
         _toonEffect = new Effect(GraphicsDevice, shaderBytes);
         
-        // Set padded vector parameters (passing Vector4 ensures exact 16-byte buffer copies)
-        Vector3 lightDir = Vector3.Normalize(new Vector3(-1f, -1.5f, -1f));
-        _toonEffect.Parameters["LightDirection"]?.SetValue(new Vector4(lightDir, 0f));
-
-        Vector3 lightCol = new Vector3(1.0f, 0.95f, 0.85f);
-        _toonEffect.Parameters["LightColor"]?.SetValue(new Vector4(lightCol, 1f));
-
-        Vector3 ambientCol = new Vector3(0.25f, 0.25f, 0.35f);
-        _toonEffect.Parameters["AmbientColor"]?.SetValue(new Vector4(ambientCol, 1f));
-
-        // ShaderParams: x = BandCount (3.0f)
-        _toonEffect.Parameters["ShaderParams"]?.SetValue(new Vector4(3.0f, 0f, 0f, 0f));
+        Console.WriteLine("=== TOON SHADER PARAMETER REFLECTION ===");
+        foreach (var param in _toonEffect.Parameters)
+        {
+            Console.WriteLine($"Name: '{param.Name}'");
+            Console.WriteLine($"  Class: {param.ParameterClass}");
+            Console.WriteLine($"  Type:  {param.ParameterType}");
+            Console.WriteLine($"  Rows:  {param.RowCount}");
+            Console.WriteLine($"  Cols:  {param.ColumnCount}");
+            Console.WriteLine($"  Elements: {param.Elements.Count}");
+            Console.WriteLine("---------------------------------------");
+        }
         // Load GLTF directly via pure C#
         
         string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content", "pixel_scene.glb");
@@ -197,6 +196,12 @@ public class Game1 : Game
         Matrix projection = _camera.ProjectionMatrix;
         Matrix worldViewProjection = world * view * projection;
 
+
+        IEnumerator<EffectParameter> enumerator = _toonEffect.Parameters.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            Console.Out.WriteLine(enumerator.Current.Name);
+        }
         // Set matrices
         _toonEffect.Parameters["World"]?.SetValue(world);
         _toonEffect.Parameters["WorldViewProjection"]?.SetValue(worldViewProjection);

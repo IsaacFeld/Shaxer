@@ -7,13 +7,13 @@
     #define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
-// EXPLICIT REGISTER BINDINGS (Forces exact 16-byte float4 slot allocation)
-float4x4 WorldViewProjection : register(c0); // Occupies c0, c1, c2, c3
-float4x4 World               : register(c4); // Occupies c4, c5, c6, c7
-float4 LightDirection        : register(c8); // Occupies c8
-float4 LightColor            : register(c9); // Occupies c9
-float4 AmbientColor          : register(c10); // Occupies c10
-float4 ShaderParams          : register(c11); // Occupies c11 (x = BandCount)
+// Standalone uniform declarations match SM3 register offsets cleanly
+float4x4 WorldViewProjection;
+float4x4 World;
+float4 LightDirection;
+float4 LightColor;
+float4 AmbientColor;
+float4 ShaderParams;
 
 struct VertexShaderInput
 {

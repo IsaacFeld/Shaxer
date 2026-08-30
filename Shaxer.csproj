@@ -41,4 +41,7 @@
     <ItemGroup>
       <ClCompile Include="Content\ToonShader.fx" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Content\bin\DesktopGL\Content\" />
+    </ItemGroup>
 </Project>
